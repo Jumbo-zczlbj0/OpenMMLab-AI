@@ -1,5 +1,4 @@
 # OpenMMLab-AI-
-Coursework 1~3
 
 Coursework 1: mmclassification
 

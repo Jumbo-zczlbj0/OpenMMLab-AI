@@ -6,9 +6,9 @@ Coursework 1: mmclassification
 
 文件夹：“resnet18_cifar10” 进阶作业
 
-文件夹：“test_wandb_resnet18_cifar10” 和进阶作业的config文件基本相同，主要是测试可视化输出输出：wandb
-	其中包含下载网页“wandb_output.html”文件
-	wandb link:https://wandb.ai/1179685746/restnet18_02_07_01/runs/ickcfrsk?workspace=user-1179685746
+文件夹：“test_wandb_resnet18_cifar10” 和进阶作业的config文件基本相同，主要是测试可视化输出输出：wandb，其中包含下载网页“wandb_output.html”文件。
+	
+wandb link:https://wandb.ai/1179685746/restnet18_02_07_01/runs/ickcfrsk?workspace=user-1179685746
 
 三个任务的“top_1”精度都是90++
 

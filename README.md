@@ -17,5 +17,6 @@ wandb link:https://wandb.ai/1179685746/restnet18_02_07_01/runs/ickcfrsk?workspac
 Coursework 2: mmdetection
 
 视频权重链接：https://drive.google.com/drive/folders/1wpKljY3cbo2V4nm0osn9qPLVFoL0jdsD?usp=sharing
+进阶作业电脑有点带不动，只训练了一次
 
 Coursework 3: mmsegmentation

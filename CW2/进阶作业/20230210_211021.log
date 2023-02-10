@@ -1,0 +1,401 @@
+2023-02-10 21:10:21,805 - mmdet - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.10.9 (main, Jan 11 2023, 15:21:40) [GCC 11.2.0]
+CUDA available: True
+GPU 0: NVIDIA GeForce RTX 3080 Laptop GPU
+CUDA_HOME: /home/jumbo/miniconda3/envs/mmlab1
+NVCC: Cuda compilation tools, release 11.7, V11.7.99
+GCC: gcc (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0
+PyTorch: 1.13.1
+PyTorch compiling details: PyTorch built with:
+  - GCC 9.3
+  - C++ Version: 201402
+  - Intel(R) oneAPI Math Kernel Library Version 2021.4-Product Build 20210904 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.6.0 (Git Hash 52b5f107dd9cf10910aaa19cb47f3abf9b349815)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.7
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_61,code=sm_61;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86;-gencode;arch=compute_37,code=compute_37
+  - CuDNN 8.5
+  - Magma 2.6.1
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.7, CUDNN_VERSION=8.5.0, CXX_COMPILER=/opt/rh/devtoolset-9/root/usr/bin/c++, CXX_FLAGS= -fabi-version=11 -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wunused-local-typedefs -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Werror=cast-function-type -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.13.1, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+TorchVision: 0.14.1
+OpenCV: 4.7.0
+MMCV: 1.7.1
+MMCV Compiler: GCC 9.3
+MMCV CUDA Compiler: 11.7
+MMDetection: 2.28.1+
+------------------------------------------------------------
+
+2023-02-10 21:10:22,213 - mmdet - INFO - Distributed training: False
+2023-02-10 21:10:22,614 - mmdet - INFO - Config:
+model = dict(
+    type='RetinaNet',
+    backbone=dict(
+        type='EfficientNet',
+        arch='b3',
+        drop_path_rate=0.2,
+        out_indices=(3, 4, 5),
+        frozen_stages=0,
+        norm_cfg=dict(type='BN', requires_grad=True, eps=0.001, momentum=0.01),
+        norm_eval=False,
+        init_cfg=dict(
+            type='Pretrained',
+            prefix='backbone',
+            checkpoint=
+            'https://download.openmmlab.com/mmclassification/v0/efficientnet/efficientnet-b3_3rdparty_8xb32-aa_in1k_20220119-5b4887a0.pth'
+        )),
+    neck=dict(
+        type='FPN',
+        in_channels=[48, 136, 384],
+        out_channels=256,
+        start_level=0,
+        add_extra_convs='on_input',
+        num_outs=5,
+        relu_before_extra_convs=True,
+        no_norm_on_lateral=True,
+        norm_cfg=dict(type='BN', requires_grad=True)),
+    bbox_head=dict(
+        type='RetinaSepBNHead',
+        num_classes=20,
+        in_channels=256,
+        stacked_convs=4,
+        feat_channels=256,
+        anchor_generator=dict(
+            type='AnchorGenerator',
+            octave_base_scale=4,
+            scales_per_octave=3,
+            ratios=[0.5, 1.0, 2.0],
+            strides=[8, 16, 32, 64, 128]),
+        bbox_coder=dict(
+            type='DeltaXYWHBBoxCoder',
+            target_means=[0.0, 0.0, 0.0, 0.0],
+            target_stds=[1.0, 1.0, 1.0, 1.0]),
+        loss_cls=dict(
+            type='FocalLoss',
+            use_sigmoid=True,
+            gamma=2.0,
+            alpha=0.25,
+            loss_weight=1.0),
+        loss_bbox=dict(type='L1Loss', loss_weight=1.0),
+        num_ins=5,
+        norm_cfg=dict(type='BN', requires_grad=True)),
+    train_cfg=dict(
+        assigner=dict(
+            type='MaxIoUAssigner',
+            pos_iou_thr=0.5,
+            neg_iou_thr=0.5,
+            min_pos_iou=0,
+            ignore_iof_thr=-1),
+        allowed_border=-1,
+        pos_weight=-1,
+        debug=False),
+    test_cfg=dict(
+        nms_pre=1000,
+        min_bbox_size=0,
+        score_thr=0.05,
+        nms=dict(type='nms', iou_threshold=0.5),
+        max_per_img=100))
+dataset_type = 'VOCDataset'
+data_root = 'data/VOCdevkit/'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', with_bbox=True),
+    dict(
+        type='Resize',
+        img_scale=(896, 896),
+        ratio_range=(0.8, 1.2),
+        keep_ratio=True),
+    dict(type='RandomCrop', crop_size=(896, 896)),
+    dict(type='RandomFlip', flip_ratio=0.5),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='Pad', size=(896, 896)),
+    dict(type='DefaultFormatBundle'),
+    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=(896, 896),
+        flip=False,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip'),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size=(896, 896)),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ])
+]
+data = dict(
+    samples_per_gpu=4,
+    workers_per_gpu=2,
+    train=dict(
+        type='RepeatDataset',
+        times=2,
+        dataset=dict(
+            type='VOCDataset',
+            ann_file='data/VOCdevkit/VOC2007/ImageSets/Main/trainval.txt',
+            img_prefix='data/VOCdevkit/VOC2007/',
+            pipeline=[
+                dict(type='LoadImageFromFile'),
+                dict(type='LoadAnnotations', with_bbox=True),
+                dict(type='Resize', img_scale=(1000, 600), keep_ratio=True),
+                dict(type='RandomFlip', flip_ratio=0.5),
+                dict(
+                    type='Normalize',
+                    mean=[123.675, 116.28, 103.53],
+                    std=[58.395, 57.12, 57.375],
+                    to_rgb=True),
+                dict(type='Pad', size_divisor=32),
+                dict(type='DefaultFormatBundle'),
+                dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+            ]),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True),
+            dict(
+                type='Resize',
+                img_scale=(896, 896),
+                ratio_range=(0.8, 1.2),
+                keep_ratio=True),
+            dict(type='RandomCrop', crop_size=(896, 896)),
+            dict(type='RandomFlip', flip_ratio=0.5),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size=(896, 896)),
+            dict(type='DefaultFormatBundle'),
+            dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+        ]),
+    val=dict(
+        type='VOCDataset',
+        ann_file='data/VOCdevkit/VOC2007/ImageSets/Main/val.txt',
+        img_prefix='data/VOCdevkit/VOC2007/',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(896, 896),
+                flip=False,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size=(896, 896)),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]),
+    test=dict(
+        type='VOCDataset',
+        ann_file='data/VOCdevkit/VOC2007/ImageSets/Main/val.txt',
+        img_prefix='data/VOCdevkit/VOC2007/',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(896, 896),
+                flip=False,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size=(896, 896)),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]))
+evaluation = dict(interval=1, metric='mAP')
+checkpoint_config = dict(interval=1)
+log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
+custom_hooks = [dict(type='NumClassCheckHook')]
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = None
+resume_from = None
+workflow = [('train', 1)]
+opencv_num_threads = 0
+mp_start_method = 'fork'
+auto_scale_lr = dict(enable=False, base_batch_size=16)
+cudnn_benchmark = True
+norm_cfg = dict(type='BN', requires_grad=True)
+img_size = (896, 896)
+optimizer_config = dict(grad_clip=None)
+optimizer = dict(
+    type='SGD',
+    lr=0.0001,
+    momentum=0.9,
+    weight_decay=0.0001,
+    paramwise_cfg=dict(norm_decay_mult=0, bypass_duplicate=True))
+lr_config = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=100,
+    warmup_ratio=0.1,
+    step=[8, 11])
+runner = dict(type='EpochBasedRunner', max_epochs=1)
+work_dir = 'work/resnet50/voc'
+auto_resume = False
+gpu_ids = [0]
+
+2023-02-10 21:10:22,614 - mmdet - INFO - Set random seed to 371333709, deterministic: False
+2023-02-10 21:10:24,378 - mmdet - INFO - Automatic scaling of learning rate (LR) has been disabled.
+2023-02-10 21:10:24,503 - mmdet - INFO - Start running, host: jumbo@jumbo-Legion-7-16ITHg6, work_dir: /home/jumbo/文档/mmdetection-master/work/resnet50/voc
+2023-02-10 21:10:24,503 - mmdet - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(NORMAL      ) CheckpointHook                     
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(NORMAL      ) NumClassCheckHook                  
+(LOW         ) IterTimerHook                      
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(LOW         ) IterTimerHook                      
+(LOW         ) EvalHook                           
+ -------------------- 
+after_train_iter:
+(ABOVE_NORMAL) OptimizerHook                      
+(NORMAL      ) CheckpointHook                     
+(LOW         ) IterTimerHook                      
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) CheckpointHook                     
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_epoch:
+(NORMAL      ) NumClassCheckHook                  
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_epoch:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_run:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+2023-02-10 21:10:24,503 - mmdet - INFO - workflow: [('train', 1)], max: 1 epochs
+2023-02-10 21:10:24,504 - mmdet - INFO - Checkpoints will be saved to /home/jumbo/文档/mmdetection-master/work/resnet50/voc by HardDiskBackend.
+2023-02-10 21:11:11,422 - mmdet - INFO - Epoch [1][50/2506]	lr: 5.410e-05, eta: 0:38:24, time: 0.938, data_time: 0.047, memory: 12957, loss_cls: 1.1745, loss_bbox: 1.3541, loss: 2.5286
+2023-02-10 21:11:38,254 - mmdet - INFO - Epoch [1][100/2506]	lr: 9.910e-05, eta: 0:29:34, time: 0.537, data_time: 0.004, memory: 13076, loss_cls: 1.1403, loss_bbox: 1.2399, loss: 2.3802
+2023-02-10 21:11:59,337 - mmdet - INFO - Epoch [1][150/2506]	lr: 1.000e-04, eta: 0:24:49, time: 0.422, data_time: 0.004, memory: 13076, loss_cls: 1.1170, loss_bbox: 1.1184, loss: 2.2354
+2023-02-10 21:12:22,447 - mmdet - INFO - Epoch [1][200/2506]	lr: 1.000e-04, eta: 0:22:39, time: 0.462, data_time: 0.004, memory: 13076, loss_cls: 1.0933, loss_bbox: 1.0146, loss: 2.1078
+2023-02-10 21:12:43,688 - mmdet - INFO - Epoch [1][250/2506]	lr: 1.000e-04, eta: 0:20:55, time: 0.425, data_time: 0.004, memory: 13076, loss_cls: 1.0662, loss_bbox: 0.9134, loss: 1.9795
+2023-02-10 21:13:04,452 - mmdet - INFO - Epoch [1][300/2506]	lr: 1.000e-04, eta: 0:19:36, time: 0.415, data_time: 0.004, memory: 13076, loss_cls: 1.0661, loss_bbox: 0.8354, loss: 1.9014
+2023-02-10 21:13:25,375 - mmdet - INFO - Epoch [1][350/2506]	lr: 1.000e-04, eta: 0:18:34, time: 0.418, data_time: 0.004, memory: 13076, loss_cls: 1.0571, loss_bbox: 0.7905, loss: 1.8476
+2023-02-10 21:13:48,831 - mmdet - INFO - Epoch [1][400/2506]	lr: 1.000e-04, eta: 0:17:55, time: 0.469, data_time: 0.004, memory: 13315, loss_cls: 1.0372, loss_bbox: 0.7416, loss: 1.7788
+2023-02-10 21:14:09,990 - mmdet - INFO - Epoch [1][450/2506]	lr: 1.000e-04, eta: 0:17:10, time: 0.423, data_time: 0.004, memory: 13315, loss_cls: 1.0230, loss_bbox: 0.7314, loss: 1.7544
+2023-02-10 21:14:31,231 - mmdet - INFO - Epoch [1][500/2506]	lr: 1.000e-04, eta: 0:16:29, time: 0.425, data_time: 0.004, memory: 13315, loss_cls: 1.0319, loss_bbox: 0.7020, loss: 1.7340
+2023-02-10 21:14:52,560 - mmdet - INFO - Epoch [1][550/2506]	lr: 1.000e-04, eta: 0:15:53, time: 0.427, data_time: 0.004, memory: 13315, loss_cls: 1.0232, loss_bbox: 0.6830, loss: 1.7062
+2023-02-10 21:15:13,614 - mmdet - INFO - Epoch [1][600/2506]	lr: 1.000e-04, eta: 0:15:18, time: 0.421, data_time: 0.004, memory: 13315, loss_cls: 0.9847, loss_bbox: 0.6695, loss: 1.6542
+2023-02-10 21:15:34,936 - mmdet - INFO - Epoch [1][650/2506]	lr: 1.000e-04, eta: 0:14:46, time: 0.426, data_time: 0.004, memory: 13315, loss_cls: 0.9922, loss_bbox: 0.6596, loss: 1.6518
+2023-02-10 21:15:56,312 - mmdet - INFO - Epoch [1][700/2506]	lr: 1.000e-04, eta: 0:14:16, time: 0.428, data_time: 0.004, memory: 13315, loss_cls: 0.9756, loss_bbox: 0.6476, loss: 1.6231
+2023-02-10 21:16:17,150 - mmdet - INFO - Epoch [1][750/2506]	lr: 1.000e-04, eta: 0:13:45, time: 0.417, data_time: 0.004, memory: 13315, loss_cls: 0.9804, loss_bbox: 0.6562, loss: 1.6366
+2023-02-10 21:16:38,677 - mmdet - INFO - Epoch [1][800/2506]	lr: 1.000e-04, eta: 0:13:17, time: 0.431, data_time: 0.004, memory: 13315, loss_cls: 0.9502, loss_bbox: 0.6344, loss: 1.5847
+2023-02-10 21:16:59,663 - mmdet - INFO - Epoch [1][850/2506]	lr: 1.000e-04, eta: 0:12:49, time: 0.420, data_time: 0.004, memory: 13315, loss_cls: 0.9813, loss_bbox: 0.6357, loss: 1.6171
+2023-02-10 21:17:21,068 - mmdet - INFO - Epoch [1][900/2506]	lr: 1.000e-04, eta: 0:12:23, time: 0.428, data_time: 0.004, memory: 13315, loss_cls: 0.9710, loss_bbox: 0.6206, loss: 1.5917
+2023-02-10 21:17:42,482 - mmdet - INFO - Epoch [1][950/2506]	lr: 1.000e-04, eta: 0:11:57, time: 0.428, data_time: 0.004, memory: 13315, loss_cls: 0.9449, loss_bbox: 0.6302, loss: 1.5751
+2023-02-10 21:18:03,603 - mmdet - INFO - Exp name: retinanet_effb3_fpn_crop896_8x4_1x_voc.py
+2023-02-10 21:18:03,603 - mmdet - INFO - Epoch [1][1000/2506]	lr: 1.000e-04, eta: 0:11:31, time: 0.422, data_time: 0.004, memory: 13315, loss_cls: 0.9366, loss_bbox: 0.6279, loss: 1.5645
+2023-02-10 21:18:25,135 - mmdet - INFO - Epoch [1][1050/2506]	lr: 1.000e-04, eta: 0:11:06, time: 0.431, data_time: 0.004, memory: 13315, loss_cls: 0.9086, loss_bbox: 0.6255, loss: 1.5341
+2023-02-10 21:18:46,770 - mmdet - INFO - Epoch [1][1100/2506]	lr: 1.000e-04, eta: 0:10:41, time: 0.433, data_time: 0.004, memory: 13315, loss_cls: 0.9323, loss_bbox: 0.6426, loss: 1.5749
+2023-02-10 21:19:08,294 - mmdet - INFO - Epoch [1][1150/2506]	lr: 1.000e-04, eta: 0:10:17, time: 0.431, data_time: 0.005, memory: 13315, loss_cls: 0.9128, loss_bbox: 0.6222, loss: 1.5350
+2023-02-10 21:19:30,804 - mmdet - INFO - Epoch [1][1200/2506]	lr: 1.000e-04, eta: 0:09:54, time: 0.450, data_time: 0.009, memory: 13315, loss_cls: 0.9124, loss_bbox: 0.6126, loss: 1.5250
+2023-02-10 21:19:53,285 - mmdet - INFO - Epoch [1][1250/2506]	lr: 1.000e-04, eta: 0:09:31, time: 0.450, data_time: 0.008, memory: 13315, loss_cls: 0.8683, loss_bbox: 0.6116, loss: 1.4798
+2023-02-10 21:20:15,586 - mmdet - INFO - Epoch [1][1300/2506]	lr: 1.000e-04, eta: 0:09:08, time: 0.446, data_time: 0.008, memory: 13315, loss_cls: 0.9128, loss_bbox: 0.6117, loss: 1.5245
+2023-02-10 21:20:38,232 - mmdet - INFO - Epoch [1][1350/2506]	lr: 1.000e-04, eta: 0:08:45, time: 0.453, data_time: 0.009, memory: 13315, loss_cls: 0.8709, loss_bbox: 0.6067, loss: 1.4777
+2023-02-10 21:21:01,119 - mmdet - INFO - Epoch [1][1400/2506]	lr: 1.000e-04, eta: 0:08:22, time: 0.458, data_time: 0.009, memory: 13315, loss_cls: 0.8736, loss_bbox: 0.5964, loss: 1.4700
+2023-02-10 21:21:23,520 - mmdet - INFO - Epoch [1][1450/2506]	lr: 1.000e-04, eta: 0:07:59, time: 0.448, data_time: 0.009, memory: 13315, loss_cls: 0.8791, loss_bbox: 0.5966, loss: 1.4756
+2023-02-10 21:21:46,046 - mmdet - INFO - Epoch [1][1500/2506]	lr: 1.000e-04, eta: 0:07:37, time: 0.451, data_time: 0.008, memory: 13315, loss_cls: 0.8674, loss_bbox: 0.5927, loss: 1.4601
+2023-02-10 21:22:08,610 - mmdet - INFO - Epoch [1][1550/2506]	lr: 1.000e-04, eta: 0:07:14, time: 0.451, data_time: 0.008, memory: 13315, loss_cls: 0.8858, loss_bbox: 0.5973, loss: 1.4831
+2023-02-10 21:22:31,010 - mmdet - INFO - Epoch [1][1600/2506]	lr: 1.000e-04, eta: 0:06:51, time: 0.448, data_time: 0.008, memory: 13315, loss_cls: 0.8418, loss_bbox: 0.5907, loss: 1.4325
+2023-02-10 21:22:53,834 - mmdet - INFO - Epoch [1][1650/2506]	lr: 1.000e-04, eta: 0:06:28, time: 0.456, data_time: 0.009, memory: 13315, loss_cls: 0.8596, loss_bbox: 0.5999, loss: 1.4595
+2023-02-10 21:23:16,048 - mmdet - INFO - Epoch [1][1700/2506]	lr: 1.000e-04, eta: 0:06:05, time: 0.444, data_time: 0.009, memory: 13315, loss_cls: 0.8633, loss_bbox: 0.5957, loss: 1.4590
+2023-02-10 21:23:38,613 - mmdet - INFO - Epoch [1][1750/2506]	lr: 1.000e-04, eta: 0:05:43, time: 0.451, data_time: 0.009, memory: 13315, loss_cls: 0.8141, loss_bbox: 0.6039, loss: 1.4180
+2023-02-10 21:24:01,248 - mmdet - INFO - Epoch [1][1800/2506]	lr: 1.000e-04, eta: 0:05:20, time: 0.453, data_time: 0.009, memory: 13315, loss_cls: 0.8306, loss_bbox: 0.5842, loss: 1.4148
+2023-02-10 21:24:24,069 - mmdet - INFO - Epoch [1][1850/2506]	lr: 1.000e-04, eta: 0:04:57, time: 0.456, data_time: 0.009, memory: 13315, loss_cls: 0.8292, loss_bbox: 0.5876, loss: 1.4168
+2023-02-10 21:24:46,864 - mmdet - INFO - Epoch [1][1900/2506]	lr: 1.000e-04, eta: 0:04:35, time: 0.456, data_time: 0.009, memory: 13315, loss_cls: 0.8176, loss_bbox: 0.5818, loss: 1.3993
+2023-02-10 21:25:09,450 - mmdet - INFO - Epoch [1][1950/2506]	lr: 1.000e-04, eta: 0:04:12, time: 0.452, data_time: 0.009, memory: 13315, loss_cls: 0.8153, loss_bbox: 0.5859, loss: 1.4012
+2023-02-10 21:25:31,912 - mmdet - INFO - Exp name: retinanet_effb3_fpn_crop896_8x4_1x_voc.py
+2023-02-10 21:25:31,913 - mmdet - INFO - Epoch [1][2000/2506]	lr: 1.000e-04, eta: 0:03:49, time: 0.449, data_time: 0.009, memory: 13315, loss_cls: 0.7967, loss_bbox: 0.5776, loss: 1.3743
+2023-02-10 21:25:54,333 - mmdet - INFO - Epoch [1][2050/2506]	lr: 1.000e-04, eta: 0:03:26, time: 0.448, data_time: 0.009, memory: 13315, loss_cls: 0.8195, loss_bbox: 0.5894, loss: 1.4088
+2023-02-10 21:26:16,501 - mmdet - INFO - Epoch [1][2100/2506]	lr: 1.000e-04, eta: 0:03:04, time: 0.443, data_time: 0.009, memory: 13315, loss_cls: 0.8242, loss_bbox: 0.5813, loss: 1.4055
+2023-02-10 21:26:39,108 - mmdet - INFO - Epoch [1][2150/2506]	lr: 1.000e-04, eta: 0:02:41, time: 0.452, data_time: 0.009, memory: 13315, loss_cls: 0.7936, loss_bbox: 0.5873, loss: 1.3808
+2023-02-10 21:27:01,839 - mmdet - INFO - Epoch [1][2200/2506]	lr: 1.000e-04, eta: 0:02:18, time: 0.455, data_time: 0.009, memory: 13315, loss_cls: 0.7774, loss_bbox: 0.5884, loss: 1.3658
+2023-02-10 21:27:24,991 - mmdet - INFO - Epoch [1][2250/2506]	lr: 1.000e-04, eta: 0:01:56, time: 0.463, data_time: 0.009, memory: 13315, loss_cls: 0.7753, loss_bbox: 0.5642, loss: 1.3395
+2023-02-10 21:27:47,721 - mmdet - INFO - Epoch [1][2300/2506]	lr: 1.000e-04, eta: 0:01:33, time: 0.455, data_time: 0.009, memory: 13315, loss_cls: 0.7989, loss_bbox: 0.5700, loss: 1.3688
+2023-02-10 21:28:10,483 - mmdet - INFO - Epoch [1][2350/2506]	lr: 1.000e-04, eta: 0:01:10, time: 0.455, data_time: 0.009, memory: 13315, loss_cls: 0.7807, loss_bbox: 0.5669, loss: 1.3476
+2023-02-10 21:28:33,074 - mmdet - INFO - Epoch [1][2400/2506]	lr: 1.000e-04, eta: 0:00:48, time: 0.452, data_time: 0.009, memory: 13315, loss_cls: 0.7822, loss_bbox: 0.5632, loss: 1.3454
+2023-02-10 21:28:55,757 - mmdet - INFO - Epoch [1][2450/2506]	lr: 1.000e-04, eta: 0:00:25, time: 0.454, data_time: 0.009, memory: 13315, loss_cls: 0.7784, loss_bbox: 0.5666, loss: 1.3449
+2023-02-10 21:29:18,350 - mmdet - INFO - Epoch [1][2500/2506]	lr: 1.000e-04, eta: 0:00:02, time: 0.452, data_time: 0.009, memory: 13315, loss_cls: 0.7696, loss_bbox: 0.5732, loss: 1.3429
+2023-02-10 21:29:21,060 - mmdet - INFO - Saving checkpoint at 1 epochs
+2023-02-10 21:32:05,501 - mmdet - INFO - 
++-------------+------+--------+--------+-------+
+| class       | gts  | dets   | recall | ap    |
++-------------+------+--------+--------+-------+
+| aeroplane   | 155  | 1504   | 0.148  | 0.005 |
+| bicycle     | 177  | 915    | 0.169  | 0.040 |
+| bird        | 243  | 3142   | 0.272  | 0.101 |
+| boat        | 150  | 719    | 0.007  | 0.000 |
+| bottle      | 252  | 1477   | 0.060  | 0.001 |
+| bus         | 114  | 409    | 0.035  | 0.004 |
+| car         | 625  | 4296   | 0.378  | 0.151 |
+| cat         | 190  | 1160   | 0.174  | 0.007 |
+| chair       | 398  | 2889   | 0.241  | 0.109 |
+| cow         | 123  | 902    | 0.098  | 0.002 |
+| diningtable | 112  | 48     | 0.036  | 0.011 |
+| dog         | 257  | 2653   | 0.292  | 0.031 |
+| horse       | 180  | 1208   | 0.278  | 0.025 |
+| motorbike   | 172  | 802    | 0.052  | 0.003 |
+| person      | 2332 | 226159 | 0.355  | 0.067 |
+| pottedplant | 266  | 305    | 0.008  | 0.001 |
+| sheep       | 127  | 663    | 0.031  | 0.001 |
+| sofa        | 124  | 255    | 0.000  | 0.000 |
+| train       | 152  | 656    | 0.020  | 0.001 |
+| tvmonitor   | 158  | 838    | 0.044  | 0.001 |
++-------------+------+--------+--------+-------+
+| mAP         |      |        |        | 0.028 |
++-------------+------+--------+--------+-------+
+2023-02-10 21:32:05,542 - mmdet - INFO - Exp name: retinanet_effb3_fpn_crop896_8x4_1x_voc.py
+2023-02-10 21:32:05,542 - mmdet - INFO - Epoch(val) [1][2510]	mAP: 0.0281, AP50: 0.0280

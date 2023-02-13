@@ -20,3 +20,5 @@ Coursework 2: mmdetection
 进阶作业电脑有点带不动，只训练了一次
 
 Coursework 3: mmsegmentation
+
+权重链接：https://drive.google.com/drive/folders/1wpKljY3cbo2V4nm0osn9qPLVFoL0jdsD?usp=sharing
